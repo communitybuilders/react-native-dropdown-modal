@@ -1,6 +1,6 @@
 {
   "name": "react-native-dropdown-modal",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An easy-to-use, styleable dropdown component for React Native!",
   "main": "index.js",
   "scripts": {
@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/communitybuilders/react-native-dropdown#readme",
   "dependencies": {
-      "react-native-vector-icons": "^2.0.3"
+    "react-native-vector-icons": "^2.0.3"
   }
 }
