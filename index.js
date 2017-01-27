@@ -36,7 +36,7 @@ class Dropdown extends Component {
         /**
          * Styles to apply to the Icon component.
          */
-        iconStyle: Icon.propTypes.style,
+        iconStyle: Text.propTypes.style,
         /**
          * Styles to apply to the container view for the Icon component
          */
@@ -49,7 +49,7 @@ class Dropdown extends Component {
         /**
          * Styles to apply to the close Icon component.
          */
-        closeIconStyle: Icon.propTypes.style,
+        closeIconStyle: Text.propTypes.style,
         /**
          * Styles to apply to the modal ListView when the dropdown is open.
          */
