@@ -1,0 +1,28 @@
+{
+  "name": "react-native-dropdown",
+  "version": "1.0.0",
+  "description": "An easy-to-use, styleable dropdown component for React Native!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/communitybuilders/react-native-dropdown.git"
+  },
+  "keywords": [
+    "dropdown",
+    "react-native",
+    "react-native-dropdown",
+    "select"
+  ],
+  "author": "Dejan Lukic <dejan.lukic@communitybuilders.com.au>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/communitybuilders/react-native-dropdown/issues"
+  },
+  "homepage": "https://github.com/communitybuilders/react-native-dropdown#readme",
+  "dependencies": {
+      "react-native-vector-icons": "^2.0.3"
+  }
+}
