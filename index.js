@@ -317,7 +317,9 @@ class Dropdown extends Component {
                     animationType={"fade"}
                     visible={this.state.showModal}
                     transparent={true}
-                    onRequestClose={this._onCloseButtonPress.bind(this)}>
+                    onRequestClose={this._onCloseButtonPress.bind(this)}
+                    supportedOrientations={['portrait', 'landscape']}
+                >
 
                     {this.state.ds.getRowCount() ?
                         <ListView
