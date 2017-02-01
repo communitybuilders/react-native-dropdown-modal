@@ -1,6 +1,6 @@
 {
   "name": "react-native-dropdown-modal",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "An easy-to-use, styleable dropdown component for React Native!",
   "main": "index.js",
   "scripts": {
