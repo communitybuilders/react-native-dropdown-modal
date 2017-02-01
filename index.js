@@ -265,6 +265,12 @@ class Dropdown extends Component {
             </TouchableOpacity>);
     }
 
+    _onPress() {
+        this.props.onPress && this.props.onPress();
+
+        this._toggleModal(true);
+    }
+
     _toggleModal = (showModal) => {
         // Dismissing keyboard ensures that any focused input will no longer
         // be focused after tapping the dropdown.
@@ -298,10 +304,10 @@ class Dropdown extends Component {
             <View style={this.props.style}>
                 <TouchableOpacity
                     style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}
-                    onPress={this._toggleModal.bind(this, true)}>
-                        <Text
-                            style={[styles.dropdown, {flex: 1}]}
-                            ref={(ref) => this.textInput = ref}>{String(this._getTitle(this.state.selectedIndex))}</Text>
+                    onPress={this._onPress.bind(this)}>
+                    <Text
+                        style={[styles.dropdown, {flex: 1}]}
+                        ref={(ref) => this.textInput = ref}>{String(this._getTitle(this.state.selectedIndex))}</Text>
 
                     <View style={{flexDirection: 'column'}}>
                         <View style={[styles.iconContainer, this.props.iconContainerStyle]}>
