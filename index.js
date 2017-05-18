@@ -337,7 +337,7 @@ class Dropdown extends Component {
                             renderRow={this.renderRow.bind(this)}
                             renderFooter={this._renderFooter.bind(this)}
                             enableEmptySections={true}
-                            keyboardShouldPersistTaps={true}
+                            keyboardShouldPersistTaps="always"
                             centerContent={true}
                         />
                         : null }
