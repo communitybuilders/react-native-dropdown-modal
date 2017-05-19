@@ -109,12 +109,10 @@ class Dropdown extends Component {
 
         let dataSource = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 
-        this.dataSourceIsMap = !Array.isArray(props.dataSource) && typeof props.dataSource === 'object';
-
         this.state = {
             ds: dataSource.cloneWithRows(props.dataSource),
             showModal: false,
-            selectedIndex: this._getInitialSelectedIndex(),
+            selectedIndex: this._getInitialSelectedIndex(props.dataSource),
             flexListViewContentContainer: false
         };
     }
@@ -126,7 +124,11 @@ class Dropdown extends Component {
         if( nextProps.dataSource !== this.props.dataSource ) {
             updateState = true;
 
+            // Update data source.
             nextState.ds = this.state.ds.cloneWithRows(nextProps.dataSource);
+
+            // Ensure we also set the initial index.
+            nextState.selectedIndex = this._getInitialSelectedIndex(nextProps.dataSource);
         }
 
         if( nextProps.selectedIndex !== this.props.selectedIndex ) {
@@ -157,19 +159,22 @@ class Dropdown extends Component {
         };
     }
 
-    _getInitialSelectedIndex() {
+    _getInitialSelectedIndex(dataSource) {
         let selectedIndex = this.props.selectedIndex;
 
         if( selectedIndex === undefined ) {
             if( this.props.defaultSelectedIndex !== undefined ) {
+                // Return the default selected index if one is set and
+                // there is no selectedIndex.
                 return this.props.defaultSelectedIndex;
             }
 
-            if( this.dataSourceIsMap ) {
-                return this._getKeyFromMap(selectedIndex);
+            for( let index in dataSource ) {
+                if( dataSource.hasOwnProperty(index) ) {
+                    // Return the first index.
+                    return index;
+                }
             }
-
-            return 0;
         }
 
         return selectedIndex;
