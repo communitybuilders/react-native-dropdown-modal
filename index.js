@@ -3,7 +3,8 @@
  */
 'use strict';
 
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 
 const ReactNative = require('react-native');
 
@@ -15,7 +16,8 @@ const {
   Modal,
   TouchableOpacity,
   StyleSheet,
-  Keyboard
+  Keyboard,
+  ViewPropTypes
 } = ReactNative;
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -41,7 +43,7 @@ class Dropdown extends Component {
     /**
      * Styles to apply to the container view for the Icon component
      */
-    iconContainerStyle: View.propTypes.style,
+    iconContainerStyle: ViewPropTypes.style,
     /**
      * The FontAwesome icon name to use for the close button in the footer
      * of the ListView when the dropdown is open.
@@ -54,7 +56,7 @@ class Dropdown extends Component {
     /**
      * Styles to apply to the modal ListView when the dropdown is open.
      */
-    modalStyle: ListView.propTypes.style,
+    modalStyle: ViewPropTypes.style,
     /**
      * Styles to apply to the individual items of the dropdown.
      */
