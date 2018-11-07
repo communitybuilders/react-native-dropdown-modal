@@ -192,6 +192,10 @@ class Dropdown extends Component {
    * @private
    */
   _getTitle(index) {
+    if( this.state.ds.getRowCount() === 0 ) {
+      return '';
+    }
+
     if( this.props.titleProperty ) {
       if( this.props.titleProperty === Dropdown.titlePropMapKey ) {
         // The map keys are our titles.
