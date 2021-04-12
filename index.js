@@ -12,7 +12,7 @@ const {
   View,
   Text,
   TextInput,
-  ListView,
+  FlatList,
   Modal,
   TouchableOpacity,
   StyleSheet,
@@ -28,7 +28,7 @@ class Dropdown extends Component {
     /**
      * The data source for the dropdown menu. Can be an array or an object.
      */
-    dataSource: PropTypes.oneOfType([
+    data: PropTypes.oneOfType([
       PropTypes.array,
       PropTypes.object,
     ]).isRequired,
@@ -100,7 +100,7 @@ class Dropdown extends Component {
   };
 
   static defaultProps = {
-    dataSource: [],
+    data: [],
     iconName: 'chevron-down',
     closeIconName: 'times-circle-o'
   };
@@ -111,43 +111,39 @@ class Dropdown extends Component {
   constructor(props) {
     super(props);
 
-    let dataSource = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-
     this.state = {
-      ds: dataSource.cloneWithRows(props.dataSource),
+      data: [],
       showModal: false,
-      selectedIndex: this._getInitialSelectedIndex(props.dataSource),
-      flexListViewContentContainer: false
+      selectedIndex: Dropdown._getInitialSelectedIndex(props),
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  static getDerivedStateFromProps(props, state) {
     let nextState = {};
-    let updateState = false;
 
-    if( nextProps.dataSource !== this.props.dataSource ) {
-      updateState = true;
+    if (props.data !== state.data) {
+      nextState.data = nextState.formattedData = props.data;
+      nextState.isMap = false;
 
-      // Update data source.
-      nextState.ds = this.state.ds.cloneWithRows(nextProps.dataSource);
+      if (!Array.isArray(props.data)) {
+        // If it's a map, format the data
+        nextState.formattedData = Dropdown.mapToArray(props.data);
+        nextState.isMap = true;
+      }
 
       // Ensure we also set the initial index.
-      nextState.selectedIndex = this._getInitialSelectedIndex(nextProps.dataSource);
+      nextState.selectedIndex = Dropdown._getInitialSelectedIndex(props);
     }
 
-    if( nextProps.selectedIndex !== this.props.selectedIndex ) {
-      updateState = true;
-
-      nextState.selectedIndex = nextProps.selectedIndex;
+    if (props.selectedIndex && props.selectedIndex !== state.selectedIndex) {
+      nextState.selectedIndex = props.selectedIndex;
     }
 
-    if( updateState === true ) {
-      this.setState(nextState);
-    }
+    return nextState;
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if( prevState.selectedIndex !== this.state.selectedIndex ) {
+    if (prevState.selectedIndex !== this.state.selectedIndex) {
       this.props.onSelectedIndexChange && this.props.onSelectedIndexChange(prevState.selectedIndex, this.state.selectedIndex);
     }
   }
@@ -163,21 +159,22 @@ class Dropdown extends Component {
     };
   }
 
-  _getInitialSelectedIndex(dataSource) {
-    let selectedIndex = this.props.selectedIndex;
+  static _getInitialSelectedIndex(props) {
+    let selectedIndex = props.selectedIndex;
+    if (selectedIndex !== undefined) {
+      return selectedIndex;
+    }
 
-    if( selectedIndex === undefined ) {
-      if( this.props.defaultSelectedIndex !== undefined ) {
-        // Return the default selected index if one is set and
-        // there is no selectedIndex.
-        return this.props.defaultSelectedIndex;
-      }
+    if (props.defaultSelectedIndex !== undefined) {
+      // Return the default selected index if one is set and
+      // there is no selectedIndex.
+      return props.defaultSelectedIndex;
+    }
 
-      for( let index in dataSource ) {
-        if( dataSource.hasOwnProperty(index) ) {
-          // Return the first index.
-          return index;
-        }
+    for (let index in props.data) {
+      if (props.data.hasOwnProperty(index)) {
+        // Return the first index.
+        return index;
       }
     }
 
@@ -191,79 +188,84 @@ class Dropdown extends Component {
    * @param index
    * @private
    */
-  _getTitle(index) {
-    if( this.state.ds.getRowCount() === 0 ) {
+  _getTitle(item) {
+    if (item === undefined) {
       return '';
     }
 
-    if( this.props.titleProperty ) {
-      if( this.props.titleProperty === Dropdown.titlePropMapKey ) {
+    let key;
+    if (this.state.isMap) {
+      // Extract key/value
+      key = item.key;
+      item = item.value;
+    }
+
+    if (this.props.titleProperty) {
+      if (this.props.titleProperty === Dropdown.titlePropMapKey) {
         // The map keys are our titles.
-        return index;
+        return key;
       }
 
-      if( this.props.titleProperty !== Dropdown.titlePropMapValue ) {
+      if (this.props.titleProperty !== Dropdown.titlePropMapValue) {
         // If we have a title property (other than a map value as a title),
         // then dig into our array and retrieve the title from the
         // titleProperty.
-        let rowData = this.state.ds.getRowData(0, index);
-
-        if( typeof rowData === 'object' ) {
-          if( rowData.hasOwnProperty(this.props.titleProperty) ) {
-            return rowData[ this.props.titleProperty ];
-          }
+        if (item.hasOwnProperty(this.props.titleProperty)) {
+          return item[ this.props.titleProperty ];
         }
       }
     }
 
-    return typeof this.props.dataSource[ index ] !== 'undefined' ? this.props.dataSource[ index ] : '';
+    return typeof item !== 'undefined' ? item : '';
   }
 
-  /**
-   * If index is undefined, returns the first key of our map.
-   *
-   * @param {number|undefined} index
-   * @returns {*}
-   * @private
-   */
-  _getKeyFromMap(index) {
-    if( index === undefined ) {
-      for( index in this.props.dataSource ) {
-        if( this.props.dataSource.hasOwnProperty(index) ) {
-          break;
-        }
-      }
+  _onSelectOption(item, index) {
+    if (this.state.isMap) {
+      index = item?.key;
     }
 
-    return index;
-  }
-
-  _onSelectOption(selectedIndex) {
-    this.props.onOptionSelected && this.props.onOptionSelected(selectedIndex, this.props.id);
+    this.props.onOptionSelected && this.props.onOptionSelected(index, this.props.id);
 
     let nextState = {
       showModal: false
     };
 
-    if( this.props.selectedIndex === undefined || this.props.selectedIndex === selectedIndex ) {
+    if (this.props.selectedIndex === undefined || this.props.selectedIndex === index) {
       // selectedIndex makes the dropdown a controlled input.
-      nextState.selectedIndex = selectedIndex;
+      nextState.selectedIndex = index;
     }
 
     this.setState(nextState);
+  }
+
+  get selectedItem() {
+    const data = this.state.formattedData;
+    if (this.state.isMap) {
+      return data.find(item => item.key === this.state.selectedIndex);
+    }
+
+    return data[ this.state.selectedIndex ];
   }
 
   _onCloseButtonPress() {
     this.setState({showModal: false});
   }
 
-  renderRow(option, sectionID, rowID) {
+  renderItem({item, index}) {
+    let title;
+
+    if (typeof item === 'string') {
+      title = item;
+    }else {
+      title = this._getTitle(item);
+    }
+
     return (
       <TouchableOpacity
-        onPress={() => this._onSelectOption(rowID)}>
+        onPress={() => this._onSelectOption(item, index)}>
         <View>
           <Text
-            style={[ styles.listViewItem, this.props.dropdownItemStyle ]}>{this._getTitle(rowID)}</Text>
+            style={[ styles.listViewItem, this.props.dropdownItemStyle ]}>{title}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -294,26 +296,19 @@ class Dropdown extends Component {
     this.setState({showModal});
   };
 
-  _setFlexListViewContainer() {
-    this.setState({flexListViewContentContainer: true});
-  }
-
-  _onEndReached = () => {
-    if( !this.state.flexListViewContentContainer ) {
-      let {visibleLength, contentLength} = this.listView.scrollProperties;
-
-      if( contentLength < visibleLength ) {
-        this._setFlexListViewContainer();
+  static mapToArray(map) {
+    return Object.keys(map).map(key => {
+      return {
+        key,
+        value: map[ key ]
       }
-    }
-  };
+    });
+  }
 
   render() {
     let listViewContentContainerStyle = [ styles.listViewContentContainer ];
 
-    if( this.state.flexListViewContentContainer ) {
-      listViewContentContainerStyle.push({flex: 1});
-    }
+    const title = this._getTitle(this.selectedItem);
 
     return (
       <View style={this.props.style}>
@@ -322,7 +317,7 @@ class Dropdown extends Component {
           onPress={this._onPress.bind(this)}>
           <Text
             style={[ styles.dropdown, {flex: 1} ]}
-            ref={(ref) => this.textInput = ref}>{String(this._getTitle(this.state.selectedIndex))}</Text>
+            ref={(ref) => this.textInput = ref}>{String(title)}</Text>
 
           <View style={{flexDirection: 'column'}}>
             <View
@@ -343,16 +338,12 @@ class Dropdown extends Component {
           supportedOrientations={[ 'portrait', 'landscape' ]}
         >
 
-          {this.state.ds.getRowCount() ?
-            <ListView
-              onEndReached={this._onEndReached}
-              ref={(ele) => {
-                this.listView = ele
-              }}
+          {this.state.formattedData.length > 0 ?
+            <FlatList
               contentContainerStyle={listViewContentContainerStyle}
               style={[ styles.listView, this.props.modalStyle ]}
-              dataSource={this.state.ds}
-              renderRow={this.renderRow.bind(this)}
+              data={this.state.formattedData}
+              renderItem={this.renderItem.bind(this)}
               renderFooter={this._renderFooter.bind(this)}
               enableEmptySections={true}
               keyboardShouldPersistTaps="always"
