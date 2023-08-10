@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/communitybuilders/react-native-dropdown#readme",
   "dependencies": {
+    "deprecated-react-native-prop-types": "^4.2.1",
     "prop-types": "^15.6.2",
     "react-native-vector-icons": "^8.1.0"
   },

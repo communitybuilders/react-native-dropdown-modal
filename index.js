@@ -17,8 +17,8 @@ const {
   TouchableOpacity,
   StyleSheet,
   Keyboard,
-  ViewPropTypes
 } = ReactNative;
+import {TextPropTypes, ViewPropTypes} from 'deprecated-react-native-prop-types';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -39,7 +39,7 @@ class Dropdown extends Component {
     /**
      * Styles to apply to the Icon component.
      */
-    iconStyle: Text.propTypes.style,
+    iconStyle: TextPropTypes.style,
     /**
      * Styles to apply to the container view for the Icon component
      */
@@ -52,7 +52,7 @@ class Dropdown extends Component {
     /**
      * Styles to apply to the close Icon component.
      */
-    closeIconStyle: Text.propTypes.style,
+    closeIconStyle: TextPropTypes.style,
     /**
      * Styles to apply to the modal ListView when the dropdown is open.
      */
@@ -60,7 +60,7 @@ class Dropdown extends Component {
     /**
      * Styles to apply to the individual items of the dropdown.
      */
-    dropdownItemStyle: Text.propTypes.style,
+    dropdownItemStyle: TextPropTypes.style,
     /**
      * The initially selected index of the dropdown.
      */
